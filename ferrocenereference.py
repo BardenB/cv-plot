@@ -13,18 +13,20 @@ def fcReference(inputFile, wait_for_plot):
     x = df['potential']
     y = df['current']
 
-    data = np.array(y)  # Use 'current' for analysis
-
-    # Apply boxcar averaging (moving average) to smooth the data
-    window_size = 5  # You can adjust this window size as needed
+    data = np.array(y)  
+    """ While boxcar averaging is not really a good idea, this will not have an impact on
+        the actual plotted data. This is simply for finding the maxima and minima."""
+    window_size = 5
     smoothed_data = np.convolve(data, np.ones(window_size)/window_size, mode='valid')
 
-    # Find local maxima and minima in the smoothed data
+    """ This is how we can find the maxima and minima of the smoothed data, which
+        will look pretty good."""
     localMaxIndices = np.where((smoothed_data[1:-1] > smoothed_data[:-2]) & (smoothed_data[1:-1] > smoothed_data[2:]))[0] + 1
     localMinIndices = np.where((smoothed_data[1:-1] < smoothed_data[:-2]) & (smoothed_data[1:-1] < smoothed_data[2:]))[0] + 1
 
-    # Filter maxima and minima based on distance
-    min_distance = 200
+    """ There's too many points plotted here because of the noise, so we need to try to only
+        plot enough points to get the real maxima and minima, without too much noise."""
+    min_distance = 5
     filteredMaxIndices = [localMaxIndices[0]]
     filteredMinIndices = [localMinIndices[0]]
 
@@ -36,11 +38,10 @@ def fcReference(inputFile, wait_for_plot):
         if min_index - filteredMinIndices[-1] > min_distance:
             filteredMinIndices.append(min_index)
 
-    # Get potential values for filtered maxima and minima
     filteredMaxPotentials = x[filteredMaxIndices]
     filteredMinPotentials = x[filteredMinIndices]
 
-    # Plot the data and filtered local maxima and minima
+    """Now, we can plot the data. yippee!"""
     plt.figure()
     plt.plot(x, y, label='Original Data')
     plt.gca().invert_xaxis()
