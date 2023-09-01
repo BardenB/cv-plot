@@ -5,6 +5,7 @@ from matplotlib.lines import Line2D
 import pandas as pd
 from statistics import mean
 
+
 class AnchoredVScaleBar(matplotlib.offsetbox.AnchoredOffsetbox):
     def __init__(self, size=1, extent = 0.03, label="", loc=2, ax=None,
                 pad=0.4, borderpad=0.5, ppad = 0, sep=2, prop=None, 
@@ -34,27 +35,42 @@ def referenceCV(peak1,peak2):
     average = mean(numbers)
     return average
 
-def PlotCV(File, outputFile, peak1,peak2):
+def shifting(df, peak1, peak2):
+    df['shiftedPotential'] = df['potential'].apply(lambda x:x - referenceCV(peak1,peak2))
+    return df['shiftedPotential']
+
+def scale():
+    ob = AnchoredVScaleBar(size=1e-5, label="10 uA", loc=2, frameon=False,
+                pad=1,sep=4, linekw=dict(color="Black"))
+    return ob
+
+def PlotCV(File, outputFile, peak1, peak2, size, color):
     file = File
     output = outputFile
     headers = ['potential','current']
     df = pd.read_csv(file, names = headers)
 
-    x = df['potential']
+    x = shifting(df, peak1, peak2)
     y = df['current']
     
-    df['shiftedPotential'] = df['potential'].apply(lambda x:x - referenceCV(peak1,peak2))
-    scatter = plt.scatter(df['shiftedPotential'],y, s = 8, color = 'blue')
+
+    # If you're ever worried the reference isn't corrent, uncomment the following:
+    #plt.scatter(df['potential'],df['current'], s = 8, color = 'red')
+        
+    scatter = plt.scatter(x, y, s = size, color = color)
+
     ax = scatter.axes
     plt.gca().invert_xaxis()
     ax.xaxis.set_major_locator(MultipleLocator(1))
     ax.yaxis.set_visible(False)
-    ob = AnchoredVScaleBar(size=1e-5, label="10 uA", loc=2, frameon=False,
-                    pad=1,sep=4, linekw=dict(color="Black"))
-
-    ax.add_artist(ob)
+    
+    ax.add_artist(scale())
+    
     for axis in ['top','right','left']:
         ax.spines[axis].set_visible(False)
     ax.spines['bottom'].set_linewidth(2)
+
     ax.set_xticklabels(ax.get_xticks(), size = 16)
     plt.savefig(output, format='png', dpi = 300, bbox_inches = 'tight')
+    
+
