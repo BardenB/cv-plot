@@ -37,6 +37,23 @@ parser.add_argument(
     required = True
 )
 
+parser.add_argument(
+    '-s',
+    '--size',
+    type = float,
+    default = 12,
+    help = 'choose size of data points.'
+)
+
+parser.add_argument(
+    '-c',
+    '--color',
+    type = str,
+    default = 'Blue',
+    help = 'Choose single color for graph.',
+    required = False
+)
+
 args = parser.parse_args()
 
 ref.fcReference(args.reference_file, wait_for_plot=True)
@@ -45,5 +62,5 @@ peak2 = float(input('Fc peak 2: '))
 FileInput = args.file
 
 File = prep.prep(FileInput)
-CV.PlotCV(File, args.outputFile, peak1, peak2)
+CV.PlotCV(File, args.outputFile, peak1, peak2, args.size, color = args.color)
 prep.rmTemp()
