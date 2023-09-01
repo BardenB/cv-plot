@@ -1,4 +1,4 @@
-#Preprocess txt files into csv files
+"""Process input txt files from CHI software into usable data."""
 import pandas as pd
 import re
 import os
