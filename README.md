@@ -2,6 +2,16 @@
 
 Process cyclic voltammetry data from CHI software in publishable quality.
 
+1. [How to download everything.](#how-to-download-everything-personal-preference-on-virtual-env-setup)
+2. [Setting up Python, Mamba, and virtual environments](#setting-up-python-mamba-and-virtual-environments)
+3. [Downloading the CV Plot CLI program](#downloading-the-cv-plot-cli-program)
+4. [Running the CV plotter](#running-the-cv-plotter)
+5. [Arguments for cvplot.py](#arguments-for-cvplotpy)
+6. [Arguments for multiplot.py](#arguments-for-multiplotpy)
+7. [Citations](#citations)
+8. [Known Limitations](#known-limitations)
+
+
 ## How to download everything (personal preference on virtual env setup)
 
 *Note*: If you are familiar with python virtual environments, you can ignore the first section on setting up virtual environments, save **step 6** for package dependencies. Personally, I prefer to use Mamba for my virtual environments, which is a conda wrapper (and what I will write about below). If you are unfamiliar with virtual environments, just know that this will help keep dependencies separate and prevent possible problems in the future.
@@ -28,33 +38,43 @@ Process cyclic voltammetry data from CHI software in publishable quality.
 
 ### Running the CV plotter
 
-Once the virtual environment is active and packages installed, it is now possible to run the UV-Vis plotting program in order to get your spectra.
+Once the virtual environment is active and packages installed, it is now possible to run the CV plotting program in order to get your voltammograms.
 
 1. To start, you must make sure your command prompt (whichever you use), is in the directory of the program.  To do that, open the folder you unzipped (in this case, the folder will be named `cv-plot`), and copy the file path. in the command prompt, type `cd` followed by a space followed by pasting the file path. You will most likely have to hit `ctrl + shift + V` rather than a typical paste. Now your command line will be in the correct folder. Depending on where you put it, you might not need the whole file path, but if you're not familiar with command line commands, just do the full path.
 2. If you are familiar with CLI programs, you can find the arguments below. Happy plotting!
-3. To run a basic CV with all default settings, type `python CVPlot.py -f \path\to\file -r \path\to\reference\file` where `\path\to\file` is replaced with the actual paths to the txt file of your data and the reference voltammogram. See the `-f` argument below on how to write that out.
-    - *Note*: Current limitation includes you must have all text files in this directory, and therefore you don't need the full path. This is an easy fix, I'm just lazy.
-    - **Remember that no directory or file can contain a space if you do a full path to the file.**
-4. If you hit enter after typing step 2, a plot will be generated and shown on your screen. This is your $Fc/Fc^+$ reference spectra. You should know which peaks are your ferrocene, and you only need to know those two numbers.  Right them down or memorize them, it does not matter. 
-5. Once you know those two numbers, simply close that plot window. The program will continue and ask you for those two numbers, one at a time. Enter in those numbers when asked.
-6. There are not many settings to change right now. There is no way to overlay plots yet, which I know is a huge aspect of comparing CV's. As of right now, the only two optional arguments are `-o` or `--outputFile`, in which you can rename your plot file name to whatever you want, as well as `-r` or `--color` for the color of the plotted data.
-6. Be aware that each time you run the same input file, it will automatically overwrite the output png to the most recent one. If you do not want that to happen, change the name of the previous run first. ***Future update, but not high priority***
-7. Once the plot is to your liking, you can simply use the png however you want. Post-processing can be done like normal.
+3. To plot a single CV with all default settings, type `python cvplot.py -f \path\to\input -r \path\to\reference -o \path\to\output` where `\path\to\x` is replaced with the actual paths to the respective txt files. See the `-f` argument below on how to write that out.
+    - *Note*: Current limitation: you must have all text files in this directory, and therefore you don't need the full path. This is an easy fix, I'm just lazy.
+    - ***Remember that no directory or file can contain a space if you do a full path to the file.***
+4. If you hit enter after typing step 3, a plot will be generated and shown on your screen. This is your $Fc/Fc^+$ reference spectra. You should know which peaks are your ferrocene, and you only need to know those two numbers.  Write them down or memorize them. 
+5. Once you have these two numbers, simply close that plot window. **You cannot move on before closing this window.** The program will continue and ask you for those two numbers, one at a time. Type in one number, hit enter, type the second, and hit enter again when asked.
+6. If you want to overlay multiple sets of data, you can use `multiplot.py` instead of `cvplot.py`. See notes on arguments below. Otherwise, it works exactly the same.
+7. Be aware that each time you run the same input file, it will automatically overwrite the output png to the most recent one. If you do not want that to happen, change the name of the previous run first. ***Future update, but not high priority***
+8. Once the plot is to your liking, you can simply use the png however you want. Post-processing can be done however you like (I know most of us use PowerPoint).
     - I currently have dpi set to 300, which is plenty for most purposes. You can change it if you want.
-8. Happy plotting!
+9. Happy plotting!
 
-## Arguments
+## Arguments for cvplot.py
 
 - `-f` or `--file` <span style = "color :red"> **Required**</span>
     - You must include the file name here. If it is not located in the same directory as `UVVisCLI.py`, you must put the full path. On Windows, right click on the file you want to process and click `Copy as path` or `Ctrl + shift + c`. You can leave the quotes when pasted. This argument can take one or more files to process. Separate files by a space only.
 - `-o` or `--outputFile` <span style = "color :red"> **Required**</span>
     - you can rename the output plot to whatever you feel appropriate here.
 - `-r` or `--reference-file` <span style = "color :red"> **Required**</span>
-    - this is the file name of the ferrocene scan. 
+    - This is the file name of the ferrocene scan. 
 - `-c` or `--color`
     - The color of the plotted data. This does not change axes, only data.
     - example: `-r purple`
-    - Each plot will be defaulted to blue.
+    - Default is blue
+- `-s` or `--size`
+    - This flag allows you to update the thickness of the data points.
+    - Default is 12, however I have found 8-16 all look okay.
+
+## Arguments for multiplot.py
+
+There are only a couple changes between `cvplot.py` and `multiplot.py` that you need to be aware of.
+- `-f` or `--files` <span style = "color :red"> **Required**</span>
+    - now, the long flag is files rather than file, and allows for an infinite amount of files (you'll break your computer trying to an infinite amount though).
+- `-c` is no longer available as an option, as it automatically cycles through the rainbow.
 
 #### Citations
 
@@ -66,6 +86,7 @@ Once the virtual environment is active and packages installed, it is now possibl
 
 Assume MIT license for now, clarification and changes may come in the future if necessary. 
 
-#### Known limitations
-- Currently, stacking plots is not an option right now. I will work on that because it is an important function of comparisons in CV. 
+#### Known Limitations
+- Files must be in this directory to work, due to the nature of the temp file system I have set up. Sorry.
+- Currently, when stacking plots, the color is automatically updated to rotate through the rainbow, plus black. I will change that feature to be customizable IFF people ask.
 - Running the same input file will automatically overwrite any plots and data output files that may generate. I will work on a way to update that such that a number or something is added to the end of the file to prevent overwriting. This is not high priority. Just rename if you need to run multiple times.
