@@ -3,20 +3,15 @@ import pandas as pd
 import numpy as np
 import preprocess as prep
 
-def fcReference(inputFile, wait_for_plot):
-    fileInput = inputFile
-    File = prep.prep(fileInput)
+plt.rcParams['mathtext.fontset'] = 'custom'
+plt.rcParams['mathtext.bf'] = 'Arial'
+plt.rcParams['font.family'] ='Arial'
+plt.rcParams['font.weight'] = 'bold'
 
-    headers = ['potential','current']
-    df = pd.read_csv(File, names = headers)
-
-    x = df['potential']
-    y = df['current']
-
-    data = np.array(y)  
+def maxmin(data,x):
     """ While boxcar averaging is not really a good idea, this will not have an impact on
         the actual plotted data. This is simply for finding the maxima and minima."""
-    window_size = 5
+    window_size = 3
     smoothed_data = np.convolve(data, np.ones(window_size)/window_size, mode='valid')
 
     """ This is how we can find the maxima and minima of the smoothed data, which
@@ -26,7 +21,7 @@ def fcReference(inputFile, wait_for_plot):
 
     """ There's too many points plotted here because of the noise, so we need to try to only
         plot enough points to get the real maxima and minima, without too much noise."""
-    min_distance = 5
+    min_distance = 30
     filteredMaxIndices = [localMaxIndices[0]]
     filteredMinIndices = [localMinIndices[0]]
 
@@ -41,10 +36,9 @@ def fcReference(inputFile, wait_for_plot):
     filteredMaxPotentials = x[filteredMaxIndices]
     filteredMinPotentials = x[filteredMinIndices]
 
-    """Now, we can plot the data. yippee!"""
-    plt.figure()
-    plt.plot(x, y, label='Original Data')
-    plt.gca().invert_xaxis()
+    return (filteredMaxPotentials, filteredMinPotentials, filteredMaxIndices, filteredMinIndices)
+
+def peakPick(data, filteredMaxPotentials, filteredMaxIndices, filteredMinPotentials, filteredMinIndices):
     plt.scatter(filteredMaxPotentials, data[filteredMaxIndices], color='red', marker='o', label='Filtered Maxima')
     plt.scatter(filteredMinPotentials, data[filteredMinIndices], color='blue', marker='o', label='Filtered Minima')
     for i, potential in enumerate(filteredMaxPotentials):
@@ -55,6 +49,32 @@ def fcReference(inputFile, wait_for_plot):
     plt.xlabel('Potential')
     plt.ylabel('Current')
     plt.title('Filtered Local Maxima and Minima')
+
+def dataproc(inputFile):
+    fileInput = inputFile
+    File = prep.prep(fileInput)
+
+    headers = ['potential','current']
+    df = pd.read_csv(File, names = headers)
+
+    ydata = np.array(df['current'])  
+    return ydata, df 
+
+def fcReference(inputFile, wait_for_plot):
+    data, df = dataproc(inputFile)
+
+    x = df['potential']
+    y = df['current']
+
+    filteredMaxPotentials, filteredMinPotentials, filteredMaxIndices, filteredMinIndices = maxmin(data,x)
+
+    """Now, we can plot the data. yippee!"""
+    plt.figure()
+    plt.plot(x, y, label='Original Data')
+    plt.gca().invert_xaxis()
+    peakPick(data, filteredMaxPotentials, filteredMaxIndices, filteredMinPotentials, filteredMinIndices)
     
     if wait_for_plot == True:
         plt.show()
+    else:
+        pass

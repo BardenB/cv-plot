@@ -8,8 +8,8 @@ rmFiles = []
 def prep(FileInput):
       File = FileInput
       csvFile = File[:-4]+'.csv'
-      txtFile = 'temp'+File
-      csvFileFinalized = 'Final'+File[:-4]+'.csv'
+      txtFile = File[:-4]+'temp'+'.txt'
+      csvFileFinalized = File[:-4]+'Final'+'.csv'
       ch = "Current/A\n"
       rmFiles.append(csvFile)
       rmFiles.append(txtFile)

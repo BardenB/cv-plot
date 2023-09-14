@@ -39,7 +39,8 @@ parser.add_argument(
 
 parser.add_argument(
     '-r',
-    '--reference-file',
+    '--reference-files',
+    nargs = '+',
     type=str,
     help='file name of the Fc/Fc+ CV you are trying to reference with.',
     required=True
@@ -54,50 +55,68 @@ parser.add_argument(
     required = False
 )
 
+parser.add_argument(
+    '-d',
+    '--stack',
+    type = float,
+    default = 3e-5,
+    help = 'Set y offset between each plot.',
+    required = False
+)
+
 args = parser.parse_args()
 
 def get_color_cycle(colors):
     color_cycle = iter(colors)
     return color_cycle
 
+def multiRef(referenceFiles):
+    refList = []
+    for reference in referenceFiles:
+        ref.fcReference(reference, wait_for_plot=True)
+        peak1 = float(input(f'Fc peak 1 for plot: '))
+        peak2 = float(input(f'Fc peak 2 for plot: '))
+        refList.append((peak1, peak2))
+    return refList
+
 def main():
 
-    ref.fcReference(args.reference_file, wait_for_plot=True)
-    peak1 = float(input('Fc peak 1: '))
-    peak2 = float(input('Fc peak 2: '))
-
-    colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'black']
+    colors = ['red', 'orange', 'green', 'green', 'blue', 'violet', 'black']
     color_cycle = get_color_cycle(colors)
 
-    labels = ['100 mV/s', '300 mV/s', '500 mV/s', '700 mV/s', '900 mV/s']
+    yShift = 0
+    references = multiRef(args.reference_files)
 
-    for FileInput, color, label in zip(args.files, colors, labels):
+    for i, (FileInput, color, refList) in enumerate(zip(args.files, colors, references)):
+
         color = next(color_cycle)
         File = prep.prep(FileInput)
-        
+
+        peak1, peak2 = refList
+
         headers = ['potential','current']
         df = pd.read_csv(File, names = headers)
         x = CV.shifting(df, peak1, peak2)
-        y = df['current']
+        y = df['current'] + yShift
 
-        scatter = plt.scatter(x, y, color = color, s = args.size, label = label)
+        scatter = plt.scatter(x, y, color = color, s = args.size)
+        yShift += args.stack
+
         ax = scatter.axes
-
         ax.xaxis.set_major_locator(MultipleLocator(0.5))
         ax.xaxis.set_major_formatter(plt.FormatStrFormatter('%.1f'))
         ax.yaxis.set_visible(False)
         for axis in ['top','right','left']:
             ax.spines[axis].set_visible(False)
         ax.spines['bottom'].set_linewidth(2)
-
         ax.set_xticklabels(ax.get_xticks(), size = 16)
-    
+
     ax.add_artist(CV.scale())
     plt.gca().invert_xaxis()
     ax.set_xlabel('Potential (V)', size = 16, weight = 'bold')
-    plt.legend(loc = 'lower right', frameon = False)
     plt.savefig(args.outputFile, format='png', dpi = 300, bbox_inches = 'tight')
-    
+    plt.close()
+
     prep.rmTemp()
 
 

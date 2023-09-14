@@ -5,7 +5,10 @@ from matplotlib.lines import Line2D
 import pandas as pd
 from statistics import mean
 
-
+plt.rcParams['mathtext.fontset'] = 'custom'
+plt.rcParams['mathtext.bf'] = 'Arial'
+plt.rcParams['font.family'] ='Arial'
+plt.rcParams['font.weight'] = 'bold'
 class AnchoredVScaleBar(matplotlib.offsetbox.AnchoredOffsetbox):
     def __init__(self, size=1, extent = 0.03, label="", loc=2, ax=None,
                 pad=0.4, borderpad=0.5, ppad = 0, sep=2, prop=None, 
@@ -63,7 +66,7 @@ def PlotCV(File, outputFile, peak1, peak2, size, color):
     plt.gca().invert_xaxis()
     ax.xaxis.set_major_locator(MultipleLocator(1))
     ax.yaxis.set_visible(False)
-    
+    ax.set_xlabel('Potential (V)', size = 16, weight = 'bold')
     ax.add_artist(scale())
     
     for axis in ['top','right','left']:
@@ -73,4 +76,3 @@ def PlotCV(File, outputFile, peak1, peak2, size, color):
     ax.set_xticklabels(ax.get_xticks(), size = 16)
     plt.savefig(output, format='png', dpi = 300, bbox_inches = 'tight')
     
-
