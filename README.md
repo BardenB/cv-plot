@@ -67,7 +67,7 @@ Once the virtual environment is active and packages installed, it is now possibl
     - Default is blue
 - `-s` or `--size`
     - This flag allows you to update the thickness of the data points.
-    - Default is 12, however I have found 8-16 all look okay.
+    - Default is 2.
 
 ## Arguments for multiplot.py
 
@@ -75,6 +75,14 @@ There are only a couple changes between `cvplot.py` and `multiplot.py` that you 
 - `-f` or `--files` <span style = "color :red"> **Required**</span>
     - now, the long flag is files rather than file, and allows for an infinite amount of files (you'll break your computer trying to an infinite amount though).
 - `-c` is no longer available as an option, as it automatically cycles through the rainbow.
+
+## Arguments for stackplot.py
+
+These are some small changes to the regular flags.
+- `-r` or `--reference-files`
+    - must include all reference files in the order that the files to plot are placed in.
+- `-d` or `--stack`
+    - the offset that each plot will be, in units of amps. Currently, set to `3e-5` but can be changed. Remember, `1e-5` is a 10 uA change.
 
 #### Citations
 
